@@ -5,9 +5,10 @@ import { extractPDF } from "@/app/lib/api";
 
 interface TextInputProps {
   onSubmit: (text: string) => void;
+  ocrCleanup?: boolean;
 }
 
-export default function TextInput({ onSubmit }: TextInputProps) {
+export default function TextInput({ onSubmit, ocrCleanup = true }: TextInputProps) {
   const [text, setText] = useState("");
   const [mode, setMode] = useState<"paste" | "pdf">("paste");
   const [pdfFile, setPdfFile] = useState<File | null>(null);
@@ -22,7 +23,7 @@ export default function TextInput({ onSubmit }: TextInputProps) {
     setIsExtracting(true);
     setError(null);
     try {
-      const result = await extractPDF(pdfFile, startPage, endPage);
+      const result = await extractPDF(pdfFile, startPage, endPage, ocrCleanup);
       if (result.char_count === 0) {
         setError("No Chinese text found on the selected pages. Try different pages or check if OCR is needed.");
         return;

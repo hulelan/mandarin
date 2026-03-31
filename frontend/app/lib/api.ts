@@ -8,7 +8,8 @@ export interface PDFExtractResponse {
 export async function extractPDF(
   file: File,
   startPage: number,
-  endPage: number | null
+  endPage: number | null,
+  cleanup: boolean = true
 ): Promise<PDFExtractResponse> {
   const formData = new FormData();
   formData.append("file", file);
@@ -16,6 +17,7 @@ export async function extractPDF(
   if (endPage !== null) {
     formData.append("end_page", String(endPage));
   }
+  formData.append("cleanup", String(cleanup));
 
   const response = await fetch("/api/extract-pdf", {
     method: "POST",

@@ -7,14 +7,18 @@ interface SentenceListProps {
   sentences: string[];
   selectedIndex: number | null;
   results: Map<number, EvaluationResponse>;
+  showRetry: boolean;
   onSelect: (index: number) => void;
+  onRetry: (index: number) => void;
 }
 
 export default function SentenceList({
   sentences,
   selectedIndex,
   results,
+  showRetry,
   onSelect,
+  onRetry,
 }: SentenceListProps) {
   return (
     <div className="space-y-3">
@@ -28,7 +32,9 @@ export default function SentenceList({
             isSelected={selectedIndex === i}
             results={evaluation?.characters ?? null}
             transcription={evaluation?.transcription ?? null}
+            showRetry={showRetry && evaluation !== undefined}
             onSelect={() => onSelect(i)}
+            onRetry={() => onRetry(i)}
           />
         );
       })}

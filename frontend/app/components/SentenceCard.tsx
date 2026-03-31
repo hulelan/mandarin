@@ -9,7 +9,9 @@ interface SentenceCardProps {
   isSelected: boolean;
   results: CharResult[] | null;
   transcription: string | null;
+  showRetry: boolean;
   onSelect: () => void;
+  onRetry: () => void;
 }
 
 const statusColors: Record<CharStatus, string> = {
@@ -26,7 +28,9 @@ export default function SentenceCard({
   isSelected,
   results,
   transcription,
+  showRetry,
   onSelect,
+  onRetry,
 }: SentenceCardProps) {
   const annotated = annotatePinyin(sentence);
 
@@ -85,8 +89,16 @@ export default function SentenceCard({
       </div>
       {results && (
         <div className="mt-3 space-y-2">
-          <div className="flex items-center gap-4 text-sm">
+          <div className="flex items-center gap-4 text-sm flex-wrap">
             <ScoreBadge results={results} />
+            {showRetry && (
+              <button
+                className="text-blue-500 hover:text-blue-700 font-medium"
+                onClick={(e) => { e.stopPropagation(); onRetry(); }}
+              >
+                Retry
+              </button>
+            )}
             <Legend />
           </div>
           {transcription && (
