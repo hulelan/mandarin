@@ -14,7 +14,7 @@ class FunASRTranscriptionService(TranscriptionService):
             )
         self.model = AutoModel(model="paraformer-zh", device="cpu")
 
-    async def transcribe(self, audio_bytes: bytes) -> str:
+    async def transcribe(self, audio_bytes: bytes, prompt: str = "") -> str:
         # FunASR needs a file path, so write to a temp file
         with tempfile.NamedTemporaryFile(suffix=".wav", delete=True) as f:
             f.write(audio_bytes)

@@ -15,6 +15,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "读音练习 - Mandarin Pronunciation Practice",
   description: "Read Chinese text aloud and get instant pronunciation feedback",
+  viewport: "width=device-width, initial-scale=1, viewport-fit=cover",
 };
 
 export default function RootLayout({

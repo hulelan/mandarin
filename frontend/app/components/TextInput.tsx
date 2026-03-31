@@ -76,28 +76,27 @@ export default function TextInput({ onSubmit }: TextInputProps) {
         </div>
       ) : (
         <div className="space-y-4">
-          {/* File picker */}
-          <div
-            className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center
-                       hover:border-gray-400 cursor-pointer transition-colors"
-            onClick={() => fileInputRef.current?.click()}
+          {/* File picker — <label> works better than onClick on mobile */}
+          <label
+            className="block border-2 border-dashed border-gray-300 rounded-lg p-8 text-center
+                       hover:border-gray-400 active:bg-gray-50 cursor-pointer transition-colors"
           >
             <input
               ref={fileInputRef}
               type="file"
-              accept=".pdf"
-              className="hidden"
+              accept=".pdf,application/pdf"
+              className="sr-only"
               onChange={(e) => {
                 setPdfFile(e.target.files?.[0] ?? null);
                 setError(null);
               }}
             />
             {pdfFile ? (
-              <p className="text-gray-700 font-medium">{pdfFile.name}</p>
+              <p className="text-gray-700 font-medium break-all">{pdfFile.name}</p>
             ) : (
-              <p className="text-gray-400">Click to select a PDF file</p>
+              <p className="text-gray-400 text-lg">Tap to select a PDF</p>
             )}
-          </div>
+          </label>
 
           {/* Page range */}
           <div className="flex items-center gap-3">

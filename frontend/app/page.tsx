@@ -59,9 +59,9 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-gray-50">
       <header className="bg-white border-b border-gray-200">
-        <div className="max-w-3xl mx-auto px-4 py-4 flex items-center justify-between">
-          <h1 className="text-xl font-bold text-gray-900">
-            读音练习 <span className="text-sm font-normal text-gray-500">Pronunciation Practice</span>
+        <div className="max-w-3xl mx-auto px-4 py-3 flex items-center justify-between">
+          <h1 className="text-lg font-bold text-gray-900">
+            读音练习 <span className="text-xs font-normal text-gray-500">Pronunciation Practice</span>
           </h1>
           {sentences.length > 0 && (
             <button
@@ -74,29 +74,16 @@ export default function Home() {
         </div>
       </header>
 
-      <main className="max-w-3xl mx-auto px-4 py-8 space-y-6">
+      <main className="max-w-3xl mx-auto px-4 py-6 space-y-4 pb-28">
         {sentences.length === 0 ? (
           <div className="space-y-4">
-            <p className="text-gray-600">
-              Paste Chinese text below, then read each sentence aloud to check
-              your pronunciation.
+            <p className="text-gray-600 text-sm">
+              Paste Chinese text or upload a PDF, then read each sentence aloud.
             </p>
             <TextInput onSubmit={handleSubmitText} />
           </div>
         ) : (
           <>
-            <div className="flex items-center gap-4">
-              <RecordButton
-                disabled={selectedIndex === null || isEvaluating}
-                onRecordingComplete={handleRecordingComplete}
-              />
-              {isEvaluating && (
-                <span className="text-sm text-blue-600 animate-pulse">
-                  Evaluating...
-                </span>
-              )}
-            </div>
-
             {error && (
               <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
                 {error}
@@ -112,6 +99,23 @@ export default function Home() {
           </>
         )}
       </main>
+
+      {/* Sticky bottom bar for recording — always visible when practicing */}
+      {sentences.length > 0 && (
+        <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-4 py-3 safe-area-bottom">
+          <div className="max-w-3xl mx-auto flex items-center justify-center gap-3">
+            <RecordButton
+              disabled={selectedIndex === null || isEvaluating}
+              onRecordingComplete={handleRecordingComplete}
+            />
+            {isEvaluating && (
+              <span className="text-sm text-blue-600 animate-pulse">
+                Evaluating...
+              </span>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

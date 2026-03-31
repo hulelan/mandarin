@@ -97,7 +97,18 @@ def _classify(expected_py: str, actual_py: str) -> CharStatus:
 
     # Same initial and final, different tone
     if exp_ini == act_ini and exp_fin == act_fin:
+        # If either side is neutral tone (5), treat as correct —
+        # neutral tone is often a transcription artifact (e.g., 的 de5 vs de2)
+        if exp_tone == "5" or act_tone == "5":
+            return CharStatus.correct
         return CharStatus.tone_wrong
+
+    # Same initial, similar final (handle common Whisper confusions)
+    # e.g., "de" vs "di" — same initial, finals differ only slightly
+    if exp_ini == act_ini and exp_fin and act_fin:
+        # If one side is neutral tone, be lenient on the final too
+        if exp_tone == "5" or act_tone == "5":
+            return CharStatus.tone_wrong
 
     return CharStatus.wrong
 

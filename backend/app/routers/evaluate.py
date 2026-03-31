@@ -25,7 +25,7 @@ async def evaluate(
     audio_bytes = await audio.read()
 
     service = get_transcription_service()
-    transcription = await service.transcribe(audio_bytes)
+    transcription = await service.transcribe(audio_bytes, prompt=sentence)
 
     characters = compare_pronunciation(sentence, transcription)
     score = compute_score(characters)

@@ -19,9 +19,13 @@ export default function RecordButton({
   const startRecording = useCallback(async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const mediaRecorder = new MediaRecorder(stream, {
-        mimeType: "audio/webm;codecs=opus",
-      });
+
+      // Pick a supported mimeType (Safari doesn't support webm)
+      const mimeType = MediaRecorder.isTypeSupported("audio/webm;codecs=opus")
+        ? "audio/webm;codecs=opus"
+        : "audio/mp4";
+
+      const mediaRecorder = new MediaRecorder(stream, { mimeType });
       mediaRecorderRef.current = mediaRecorder;
       chunksRef.current = [];
 
@@ -32,11 +36,10 @@ export default function RecordButton({
       };
 
       mediaRecorder.onstop = async () => {
-        // Stop all tracks to release the microphone
         stream.getTracks().forEach((t) => t.stop());
 
-        const webmBlob = new Blob(chunksRef.current, { type: "audio/webm" });
-        const wavBlob = await blobToWav(webmBlob);
+        const blob = new Blob(chunksRef.current, { type: mimeType });
+        const wavBlob = await blobToWav(blob);
         onRecordingComplete(wavBlob);
       };
 
@@ -54,42 +57,37 @@ export default function RecordButton({
     }
   }, [isRecording]);
 
+  if (disabled && !isRecording) {
+    return (
+      <span className="text-sm text-gray-400 py-3">
+        Tap a sentence above to select it
+      </span>
+    );
+  }
+
   return (
-    <div className="flex items-center gap-3">
-      {!isRecording ? (
-        <button
-          className="flex items-center gap-2 px-6 py-3 bg-red-500 text-white rounded-full
-                     hover:bg-red-600 disabled:opacity-50 disabled:cursor-not-allowed
-                     transition-colors text-lg font-medium"
-          disabled={disabled}
-          onClick={startRecording}
-        >
-          <svg
-            className="w-5 h-5"
-            fill="currentColor"
-            viewBox="0 0 24 24"
-          >
+    <button
+      className={`flex items-center justify-center gap-2 min-w-[160px] px-8 py-4 rounded-full
+                  text-white text-lg font-medium transition-all active:scale-95
+                  ${isRecording
+                    ? "bg-gray-700 hover:bg-gray-800"
+                    : "bg-red-500 hover:bg-red-600"}`}
+      onClick={isRecording ? stopRecording : startRecording}
+    >
+      {isRecording ? (
+        <>
+          <span className="w-4 h-4 bg-red-500 rounded-sm animate-pulse" />
+          Stop
+        </>
+      ) : (
+        <>
+          <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
             <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z" />
             <path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z" />
           </svg>
           Record
-        </button>
-      ) : (
-        <button
-          className="flex items-center gap-2 px-6 py-3 bg-gray-700 text-white rounded-full
-                     hover:bg-gray-800 transition-colors text-lg font-medium"
-          onClick={stopRecording}
-        >
-          <span className="w-4 h-4 bg-red-500 rounded-sm animate-pulse" />
-          Stop
-        </button>
+        </>
       )}
-      {isRecording && (
-        <span className="text-sm text-gray-500">Recording...</span>
-      )}
-      {disabled && !isRecording && (
-        <span className="text-sm text-gray-400">Select a sentence first</span>
-      )}
-    </div>
+    </button>
   );
 }

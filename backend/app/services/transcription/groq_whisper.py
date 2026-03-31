@@ -13,7 +13,7 @@ class GroqWhisperTranscriptionService(TranscriptionService):
             base_url="https://api.groq.com/openai/v1",
         )
 
-    async def transcribe(self, audio_bytes: bytes) -> str:
+    async def transcribe(self, audio_bytes: bytes, prompt: str = "") -> str:
         audio_file = io.BytesIO(audio_bytes)
         audio_file.name = "audio.wav"
 
@@ -21,5 +21,6 @@ class GroqWhisperTranscriptionService(TranscriptionService):
             model="whisper-large-v3",
             file=audio_file,
             language="zh",
+            prompt=prompt or None,
         )
         return response.text

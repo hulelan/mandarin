@@ -10,7 +10,7 @@ class WhisperTranscriptionService(TranscriptionService):
     def __init__(self):
         self.client = AsyncOpenAI(api_key=settings.openai_api_key)
 
-    async def transcribe(self, audio_bytes: bytes) -> str:
+    async def transcribe(self, audio_bytes: bytes, prompt: str = "") -> str:
         audio_file = io.BytesIO(audio_bytes)
         audio_file.name = "audio.wav"
 
@@ -18,5 +18,6 @@ class WhisperTranscriptionService(TranscriptionService):
             model="whisper-1",
             file=audio_file,
             language="zh",
+            prompt=prompt or None,
         )
         return response.text
