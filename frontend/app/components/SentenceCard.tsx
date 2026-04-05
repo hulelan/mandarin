@@ -65,11 +65,14 @@ export default function SentenceCard({
           return (
             <span key={i} className="inline-flex flex-col items-center">
               {showPinyin ? (
-                <span className="text-xs text-gray-500 mb-0.5">
-                  {result?.status === "tone_wrong" || result?.status === "wrong"
-                    ? result.actual_pinyin ?? item.pinyin
-                    : item.pinyin}
-                </span>
+                result?.status === "tone_wrong" || result?.status === "wrong" ? (
+                  <span className="flex flex-col items-center mb-0.5">
+                    <span className="text-xs text-green-600 leading-tight">{item.pinyin}</span>
+                    <span className="text-xs text-red-400 leading-tight line-through">{result.actual_pinyin}</span>
+                  </span>
+                ) : (
+                  <span className="text-xs text-gray-500 mb-0.5">{item.pinyin}</span>
+                )
               ) : item.isChinese ? (
                 <span className="text-xs mb-0.5 invisible">pin</span>
               ) : null}

@@ -1,11 +1,20 @@
 /**
- * Split Chinese text into sentences on Chinese punctuation and newlines.
+ * Split Chinese text into sentences on Chinese punctuation.
+ * Joins lines within paragraphs first (OCR often adds line breaks mid-sentence).
  * Keeps punctuation attached to the preceding sentence.
  */
 export function splitSentences(text: string): string[] {
-  // Split on Chinese sentence-ending punctuation (。！？) and newlines
-  // The regex keeps the delimiter attached to the preceding text
-  const raw = text.split(/(?<=[。！？\n])/);
+  // First: merge lines within paragraphs.
+  // A double newline = paragraph break. Single newlines = OCR line wrapping.
+  const paragraphs = text.split(/\n{2,}/);
+  const merged = paragraphs
+    .map((p) => p.replace(/\n/g, "").trim())
+    .filter((p) => p.length > 0)
+    .join("\n");
+
+  // Split on Chinese sentence-ending punctuation (。！？)
+  // Don't split on newlines anymore — those are paragraph joins
+  const raw = merged.split(/(?<=[。！？])/);
 
   return raw
     .map((s) => s.trim())
