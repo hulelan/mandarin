@@ -3,7 +3,7 @@
 import { useState, useRef } from "react";
 import { extractPDF } from "@/app/lib/api";
 
-const SAMPLE_TEXT = `春天来了，花儿开了。小鸟在树上唱歌，蝴蝶在花丛中飞舞。天气越来越暖和了，人们都出来散步。公园里到处都是欢声笑语。孩子们在草地上奔跑，老人们坐在长椅上聊天。这是一年中最美好的季节。`;
+const SAMPLE_TEXT = `春天来了，花儿开了，小鸟在树上唱歌，蝴蝶在花丛中飞舞。天气越来越暖和了，人们都出来散步，公园里到处都是欢声笑语。孩子们在草地上奔跑，老人们坐在长椅上聊天，这是一年中最美好的季节。`;
 
 interface TextInputProps {
   onSubmit: (text: string) => void;
