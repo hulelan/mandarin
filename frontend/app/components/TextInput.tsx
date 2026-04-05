@@ -3,6 +3,8 @@
 import { useState, useRef } from "react";
 import { extractPDF } from "@/app/lib/api";
 
+const SAMPLE_TEXT = `春天来了，花儿开了。小鸟在树上唱歌，蝴蝶在花丛中飞舞。天气越来越暖和了，人们都出来散步。公园里到处都是欢声笑语。孩子们在草地上奔跑，老人们坐在长椅上聊天。这是一年中最美好的季节。`;
+
 interface TextInputProps {
   onSubmit: (text: string) => void;
   ocrCleanup?: boolean;
@@ -66,14 +68,23 @@ export default function TextInput({ onSubmit, ocrCleanup = true }: TextInputProp
             value={text}
             onChange={(e) => setText(e.target.value)}
           />
-          <button
-            className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700
-                       disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-            disabled={!text.trim()}
-            onClick={() => onSubmit(text.trim())}
-          >
-            Start Practice
-          </button>
+          <div className="flex items-center gap-3">
+            <button
+              className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700
+                         disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              disabled={!text.trim()}
+              onClick={() => onSubmit(text.trim())}
+            >
+              Start Practice
+            </button>
+            <button
+              className="px-4 py-2 text-sm text-gray-500 hover:text-gray-700 border border-gray-300
+                         rounded-lg hover:bg-gray-50 transition-colors"
+              onClick={() => onSubmit(SAMPLE_TEXT)}
+            >
+              Try a sample
+            </button>
+          </div>
         </div>
       ) : (
         <div className="space-y-4">
