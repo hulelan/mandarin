@@ -1,7 +1,7 @@
+import base64
 import os
-import subprocess
-import tempfile
 
+import httpx
 import pymupdf
 
 
@@ -10,17 +10,10 @@ def extract_text_from_pdf(
     start_page: int = 1,
     end_page: int | None = None,
 ) -> str:
-    """Extract Chinese text from a PDF. Falls back to OCR if text extraction yields little content.
-
-    Args:
-        pdf_bytes: Raw PDF file bytes.
-        start_page: First page to extract (1-indexed).
-        end_page: Last page to extract (1-indexed, inclusive). None = same as start_page.
-    """
+    """Extract Chinese text from a PDF. Falls back to cloud OCR if text extraction yields little content."""
     doc = pymupdf.open(stream=pdf_bytes, filetype="pdf")
     total_pages = len(doc)
 
-    # Clamp page range
     start_idx = max(0, start_page - 1)
     end_idx = min(total_pages, (end_page or start_page)) - 1
 
@@ -32,24 +25,21 @@ def extract_text_from_pdf(
 
     text = "\n".join(text_parts).strip()
 
-    # Check if we got meaningful Chinese content
     chinese_char_count = sum(1 for ch in text if _is_chinese(ch))
     if chinese_char_count >= 5:
         doc.close()
         return text
 
-    # Fallback: OCR via tesseract on rendered page images
-    # Use lower DPI (150) to reduce memory usage on free hosting tiers
+    # Fallback: Google Cloud Vision OCR (runs on Google's servers, not ours)
     ocr_dpi = int(os.environ.get("OCR_DPI", "150"))
     ocr_parts = []
     for page_num in range(start_idx, end_idx + 1):
         page = doc[page_num]
         pix = page.get_pixmap(dpi=ocr_dpi)
         img_bytes = pix.tobytes("png")
-        # Free the pixmap immediately to reduce peak memory
         del pix
 
-        ocr_text = _ocr_image(img_bytes)
+        ocr_text = _ocr_google_vision(img_bytes)
         del img_bytes
         if ocr_text:
             ocr_parts.append(ocr_text)
@@ -58,22 +48,37 @@ def extract_text_from_pdf(
     return "\n".join(ocr_parts).strip()
 
 
-def _ocr_image(png_bytes: bytes) -> str:
-    """Run Tesseract OCR on a PNG image, targeting Chinese simplified + traditional."""
-    with tempfile.NamedTemporaryFile(suffix=".png", delete=True) as f:
-        f.write(png_bytes)
-        f.flush()
+def _ocr_google_vision(png_bytes: bytes) -> str:
+    """OCR via Google Cloud Vision API. Needs GOOGLE_CLOUD_API_KEY env var."""
+    api_key = os.environ.get("GOOGLE_CLOUD_API_KEY", "")
+    if not api_key:
+        return ""
 
-        try:
-            result = subprocess.run(
-                ["tesseract", f.name, "stdout", "-l", "chi_sim"],
-                capture_output=True,
-                text=True,
-                timeout=30,
-            )
-            return result.stdout.strip()
-        except (subprocess.TimeoutExpired, FileNotFoundError):
-            return ""
+    b64_image = base64.b64encode(png_bytes).decode("utf-8")
+
+    payload = {
+        "requests": [{
+            "image": {"content": b64_image},
+            "features": [{"type": "TEXT_DETECTION"}],
+            "imageContext": {"languageHints": ["zh-Hans", "zh-Hant"]},
+        }]
+    }
+
+    try:
+        resp = httpx.post(
+            f"https://vision.googleapis.com/v1/images:annotate?key={api_key}",
+            json=payload,
+            timeout=30.0,
+        )
+        resp.raise_for_status()
+        data = resp.json()
+
+        annotations = data.get("responses", [{}])[0].get("textAnnotations", [])
+        if annotations:
+            return annotations[0].get("description", "").strip()
+        return ""
+    except Exception as e:
+        return f"OCR error: {e}"
 
 
 def _is_chinese(ch: str) -> bool:
