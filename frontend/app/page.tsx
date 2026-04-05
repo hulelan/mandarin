@@ -133,13 +133,13 @@ export default function Home() {
       {/* Footer — only on landing page */}
       {sentences.length === 0 && (
         <footer className="fixed bottom-0 left-0 right-0 py-4 text-center text-xs text-gray-400">
-          Built by{" "}
+          Reach out to{" "}
           <a href="https://mossjing.com" target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-gray-700 underline underline-offset-2">
             Moss Jing
           </a>
-          {" "}&middot;{" "}
+          {" "}at{" "}
           <a href="mailto:moss.h.jing@gmail.com" className="text-gray-500 hover:text-gray-700 underline underline-offset-2">
-            Feedback
+            moss.h.jing@gmail.com
           </a>
         </footer>
       )}
