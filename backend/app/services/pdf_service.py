@@ -1,4 +1,4 @@
-import io
+import os
 import subprocess
 import tempfile
 
@@ -39,14 +39,18 @@ def extract_text_from_pdf(
         return text
 
     # Fallback: OCR via tesseract on rendered page images
+    # Use lower DPI (150) to reduce memory usage on free hosting tiers
+    ocr_dpi = int(os.environ.get("OCR_DPI", "150"))
     ocr_parts = []
     for page_num in range(start_idx, end_idx + 1):
         page = doc[page_num]
-        # Render at 300 DPI for good OCR quality
-        pix = page.get_pixmap(dpi=300)
+        pix = page.get_pixmap(dpi=ocr_dpi)
         img_bytes = pix.tobytes("png")
+        # Free the pixmap immediately to reduce peak memory
+        del pix
 
         ocr_text = _ocr_image(img_bytes)
+        del img_bytes
         if ocr_text:
             ocr_parts.append(ocr_text)
 
@@ -62,7 +66,7 @@ def _ocr_image(png_bytes: bytes) -> str:
 
         try:
             result = subprocess.run(
-                ["tesseract", f.name, "stdout", "-l", "chi_sim+chi_tra"],
+                ["tesseract", f.name, "stdout", "-l", "chi_sim"],
                 capture_output=True,
                 text=True,
                 timeout=30,

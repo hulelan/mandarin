@@ -5,7 +5,6 @@ RUN apt-get update && \
     apt-get install -y --no-install-recommends \
     tesseract-ocr \
     tesseract-ocr-chi-sim \
-    tesseract-ocr-chi-tra \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
