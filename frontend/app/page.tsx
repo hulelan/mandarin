@@ -130,6 +130,20 @@ export default function Home() {
         )}
       </main>
 
+      {/* Footer — only on landing page */}
+      {sentences.length === 0 && (
+        <footer className="fixed bottom-0 left-0 right-0 py-4 text-center text-xs text-gray-400">
+          Built by{" "}
+          <a href="https://mossjing.com" target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-gray-700 underline underline-offset-2">
+            Moss Jing
+          </a>
+          {" "}&middot;{" "}
+          <a href="mailto:moss.h.jing@gmail.com" className="text-gray-500 hover:text-gray-700 underline underline-offset-2">
+            Feedback
+          </a>
+        </footer>
+      )}
+
       {/* Sticky bottom bar for recording */}
       {sentences.length > 0 && (
         <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-4 py-3 safe-area-bottom">
