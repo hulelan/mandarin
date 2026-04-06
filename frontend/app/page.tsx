@@ -134,11 +134,7 @@ export default function Home() {
       {sentences.length === 0 && (
         <footer className="fixed bottom-0 left-0 right-0 py-4 text-center text-xs text-gray-400">
           <a href="https://mossjing.com" target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-gray-700 underline underline-offset-2">
-            Moss Jing
-          </a>
-          {" "}at{" "}
-          <a href="mailto:moss.h.jing@gmail.com" className="text-gray-500 hover:text-gray-700 underline underline-offset-2">
-            moss.h.jing@gmail.com
+            www.mossjing.com
           </a>
         </footer>
       )}
