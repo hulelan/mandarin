@@ -136,6 +136,10 @@ export default function Home() {
           <a href="https://mossjing.com" target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-gray-700 underline underline-offset-2">
             www.mossjing.com
           </a>
+          {" "}&middot;{" "}
+          <a href="mailto:moss.h.jing@gmail.com" className="text-gray-500 hover:text-gray-700 underline underline-offset-2">
+            moss.h.jing@gmail.com
+          </a>
         </footer>
       )}
 
